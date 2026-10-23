@@ -7,6 +7,7 @@ import { ChatGroq } from "@langchain/groq";
 import { Annotation, MessagesAnnotation, StateGraph } from "@langchain/langgraph";
 import { ToolNode } from "@langchain/langgraph/prebuilt";
 import { TavilySearch } from "@langchain/tavily";
+import { MemorySaver } from "@langchain/langgraph";
 dotenv.config();
 
 const app = express();
@@ -23,8 +24,13 @@ const ai = new GoogleGenAI({
 const tool = new TavilySearch({
   maxResults: 5,
   topic: "general",
-
 });
+
+  //Memory Integration
+  
+  const checkPointers = new MemorySaver()
+  
+
 //making Array of tools ------>>>
 const tools = [tool]
 const toolNode = new ToolNode(tools)
@@ -34,9 +40,10 @@ const toolNode = new ToolNode(tools)
 const llm =new ChatGroq({
   model: "openai/gpt-oss-120b",
   temperature:0.7,
-  maxTokens:1000,
+  maxTokens:100,
   maxRetries:2 
 }).bindTools(tools) //ab tool use kr payega 
+
 
 
 
@@ -81,7 +88,7 @@ const graph = new StateGraph(MessagesAnnotation)//State can be done here for con
 .addEdge("__start__","agent")
 .addEdge("tools","agent")
 .addConditionalEdges("agent", shouldContinue)//calling 
-.compile()
+.compile({checkpointer:checkPointers})
 
 
 
@@ -94,7 +101,11 @@ app.post("/ai", async (req, res) => {
       role:"user",
       content:input  //messgaes array ke andar chala jayega 
     }
-  ]})
+  ]},
+  {
+    configurable:{thread_id:"user123"}
+  }
+)
   console.log(response)
   
 
