@@ -96,4 +96,85 @@ GROQ_API_KEY=your_groq_api_key
 TAVILY_API_KEY=your_tavily_api_key
 ```
 
-Use the exact environment variable names referenced in
+Use the exact environment variable names referenced in your code. Add `.env` to `.gitignore` to protect your API keys.
+
+### 4. Run the server
+
+```bash
+node index.js
+```
+
+## 📡 API Usage
+
+### Health Check
+
+**GET** `/`
+
+```http
+http://localhost:5001/
+```
+
+Example response:
+
+```json
+{
+  "message": "Hello from level 4"
+}
+```
+
+### Ask JARVIS
+
+**POST** `/ai`
+
+```http
+http://localhost:5001/ai
+```
+
+Request body:
+
+```json
+{
+  "input": "What is JavaScript?"
+}
+```
+
+Example response:
+
+```json
+{
+  "ai": "JavaScript is a programming language used to build interactive web applications."
+}
+```
+
+### Web Search Example
+
+```json
+{
+  "input": "Search the web for the latest Node.js LTS version."
+}
+```
+
+When the model requests a search, LangGraph routes execution to Tavily and returns the results to the agent for response generation.
+
+## 📂 Project Structure
+
+```text
+jarvis-ai-agent/
+├── index.js
+├── .env
+├── .gitignore
+├── package.json
+└── README.md
+```
+
+*Adjust this structure to match your actual repository.*
+
+## 🔐 Security
+
+- Never commit API keys or your `.env` file.
+- Validate incoming API requests.
+- Handle API errors and rate limits appropriately.
+
+---
+
+**Built with LangChain, LangGraph, Groq, and Tavily.** 🚀
